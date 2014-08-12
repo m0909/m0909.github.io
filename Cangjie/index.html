@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>倉頡打字練習</title>
+<style type="text/css">
+	body { font-family: MingLiu; }	
+	.numbers { font-family: Arial; }
+	.alignRight { text-align: right; }
+</style>
+</head>
+<body>
+<h1>倉頡打字練習</h1>
+<br />
+<table>
+<tr>
+<!--- options --->
+<td>
+<table style="border: 2px solid gray;"><tbody>
+<tr><td colspan=2 style="font-size: 1.5em; text-align: center; background:gray; color: white;">設定</td></tr>
+<tr><td>練習項目</td><td>
+	<select id="gameOption">
+		<option value="keyboard">倉頡鍵盤</option>
+		<option value="letters">倉頡字母</option>
+		<option value="baseForms">基本字型</option>
+		<option value="derivedStrokes">輔助字型（筆劃型）</option>
+		<option value="derivedHooks">輔助字型（勾型）</option>
+		<option value="derivedShapes1">輔助字型（１）</option>
+		<option value="derivedShapes2">輔助字型（２）</option>
+		<option value="derivedShapes3">輔助字型（３）</option>
+		<option value="composite">複合字</option>
+		<option value="difficult">難字</option>
+		<option value="skippedLeft">省略碼（左旁）</option>
+		<option value="skippedRight12L">省略碼（右旁／整體）</option>
+		<option value="skippedRight1LL">省略碼（右旁／分體）</option>
+		<option value="skippedInnerFrame">省略碼（包含字）</option>
+		<option value="whole">整體字</option>
+		<option value="threeParts">三體組合字</option>
+	</select>
+</td></tr>
+<tr><td>新增字速度(每0.5至5秒一個)</td><td><input type="number" id="speed" min="0.5" max="5" step="0.1" required="required" value="2" /></td></tr>
+<tr><td>打字總數(10至100個)</td><td><input type="number" id="numToPlay" min="10" max="100" step="10" required="required" value="50" /></td></tr>
+<tr><td>最多未清除的字數(5至10個)</td><td><input type="number" id="maxChain" min="5" max="10" step="1" required="required" value="5" /></td></tr>
+</tbody>
+</table>
+</td>
+<!--- remaining characters --->
+<td>&nbsp;
+</td>
+<td style="vertical-align: top; width: 10em; border: 2px green solid;">
+<div style="font-size: 1.5em; text-align: center;">剩餘字數</div><br />
+<div style="font-size: 4em; text-align: center;" class="numbers" id="characterCounter">0</div>
+</td>
+<!--- statistics --->
+<td>&nbsp;
+</td>
+<td style="vertical-align: top; width: 15em; border: 2px green solid;">
+<table style="width: 100%">
+<tr><td colspan="2" style="font-size: 1.5em; text-align: center;">統計</td></tr>
+<tr><td>分數</td><td id="score" class="numbers alignRight">0</td></tr>
+<tr><td>最長無誤碼</td><td id="longestStreak" class="numbers alignRight">0</td></tr>
+<tr><td>現無誤碼</td><td id="currentStreak" class="numbers alignRight">0</td></tr>
+<tr><td>打字速度（每分鐘字數）</td><td id="typingSpeed" class="numbers alignRight">待計</td></tr>
+</table>
+</tr>
+</table>
+<div style="padding-left: 14em;"><button onclick="gameDriver()" style="display: inline-block; height: 30px;">開始練習</button></div>
+
+<canvas id="gameBoard" width="1400" height="200" style="border: 1px solid lightgray;">
+</canvas>
+<br />
+<div id="log" style="dotted 1px gray;">&nbsp;</div>
+
+<script src="js/gamelogic.js"></script>
+
+</body>
+</html>
