@@ -302,7 +302,7 @@ function loadCharacters(gameState) {
 				"賂BCHER",	"貼BCYR",	"賠BCYTR",	"賊BCIJ",	"販BCHE",	"賤BCII",
 				"趴RMC",		"路RMHER",	"跌RMHQO",	"跋RMIKK",	"跟RMAV",	"蹈RMBHX",
 				"鞋TJGG",	"靶TJAU",	"靴TJOP",
-				"默WFIK",	"點WFYR",	"黯WFYRA",
+				"默WFIK",	"點WFYR",	"黯WFYTA",
 				"飲OINO",	"餒OIBV",	"飼OISMR",	"餛OIAPP",	"飽OIPRU",	"飯OIHE",
 				"齦YUAV",	"齟YUBM",	"齣YUPR",
 				"鯛NFBGR",	"鯖NFQMB",	"鮮NFTQ",
