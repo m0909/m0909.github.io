@@ -71,7 +71,14 @@ function gameDriver() {
 	gameState.score = 0;
 	gameState.currentStreak = 0;
 	gameState.longestStreak = 0;
+	gameState.typingSpeed = "待計";
 	gameState.startTime = getCurrentTime();
+	gameState.dom = [];
+	
+	gameState.dom[0] = document.getElementById("score");
+	gameState.dom[1] = document.getElementById("currentStreak");
+	gameState.dom[2] = document.getElementById("longestStreak");
+	gameState.dom[3] = document.getElementById("typingSpeed");
 	
 	localStorage["cj.maxChain"] = gameState.maxChain;
 	localStorage["cj.speed"] = gameState.speed/1000;
@@ -154,7 +161,7 @@ function loadCharacters(gameState) {
 				"亡YV",		"介OLL",		"仗OJK",		"仟OHJ",		"仸OHK",		"任OHG",		"企OYLM",	"伏OIK",		"伯OHA",		"伷OLW",
 				"伸OLWL",	"佑OKR",		"佖OPH",		"佛OLLN",	"弗LLN",		"佸OHJR",	"沸ELLN",	"活OHJR",	"括QHJR",	"吏JLK",
 				"使OJLK",	"侏OHJD",	"朱HJD",		"珠MGHJD",	"呂RHR",		"侶ORHR",	"俰OHDR",	"和HDR",		"入OH",		"八HO",
-				"千HJ",		"吠EIK",		"呈RHG",		"程HDRHG",	"呎RSO",		"伬OSO",		"呑HKR",		"哭RRIK",	"圳GLLL",	"川LLL",
+				"千HJ",		"吠RIK",		"呈RHG",		"程HDRHG",	"呎RSO",		"伬OSO",		"呑HKR",		"哭RRIK",	"圳GLLL",	"川LLL",
 				"址GYLM",	"扯QYLM",	"止YLM",		"沚EYLM",	"太KI",		"夭HK",		"尺SO",		"引NL",		"往HOYG",	"必PH",
 				"泌EPH",		"戊IH",		"戌IHM",		"戍IHI",		"戎IJ",		"我HQI",		"拍QHA",		"泊EHA",		"白HA",		"有KB",
 				"杉DHHH",	"彬DDHHH",	"杊DLLL",	"正MYLM",	"油RLA",		"抽QLW",		"鈾CLW",		"泉HAE",		"灰KF",		"玟MGYK",
@@ -423,7 +430,7 @@ function addCharacter(gameState) {
 	
 	if ( gameState.throughPosition - gameState.currentPosition == gameState.maxChain ) {
 		gameState.status = -1;  //lost
-		terminateGame(gameState, false);
+		terminateGame(gameState);
 		return false;
 	}
 	
@@ -432,38 +439,51 @@ function addCharacter(gameState) {
 	return true;
 }
 
-function clearBoard(gameState, color) {
+function clearBoard(gameState) {
 
-    if( typeof(color) === "undefined" ) {
-		color = "white";
+	var color;
+	
+	switch (gameState.status) {
+		case 1:		
+			color = "green";
+			break;
+			
+		case -1:
+			color = "black";
+			break;
+			
+		case 0:
+			color = "white";
+			break;
 	}
 	
-	gameState.context.fillStyle = color;
+    gameState.context.fillStyle = color;
 	gameState.context.fillRect(BOARD_LEFT, BOARD_TOP, BOARD_WIDTH, BOARD_HEIGHT);
+
+	displayStatistics(gameState);
+	
 }
 
-function terminateGame(gameState, isGameWon) {
+function terminateGame(gameState) {
 	var color;
 	var message;
     var timeElapsed;
 	
 	showNumberLeft(gameState);
 	timeElapsed = (getCurrentTime() - gameState.startTime) / 60;
-	document.getElementById("typingSpeed").innerHTML = Math.round(gameState.throughPosition / timeElapsed);
+	gameState.typingSpeed = Math.round(gameState.throughPosition / timeElapsed);
 
 	clearTimer(gameState);
 	window.removeEventListener('keydown', doKeyDown, false);	
 		
-	if ( isGameWon == 1 ) {
-		color = "green";
+	if ( gameState.status == 1 ) {
 		message = "恭喜\uFF01你贏了\uFF01";
 	}
 	else {
-		color = "black";
 		message = "對不起\uFF0C你輸了\u3002";
 	}
 	
-	clearBoard(gameState, color);
+	clearBoard(gameState);
 	gameState.context.fillStyle = "white";
 	gameState.context.font = CHAIN_FONT;
 	gameState.context.fillText(message, CHAIN_LEFT, CHAIN_FONT_BOTTOM);
@@ -600,11 +620,11 @@ function doKeyDown(e) {
 					gameState.currentStreak = 0;
 				}
 				
-				displayStatistics(gameState);
+				displayStatistics(gameState, true);
 				
 				if ( gameState.currentPosition == ( gameState.endPosition ) ) {
 					gameState.status = 1;  //won!
-					terminateGame(gameState, true);
+					terminateGame(gameState);
 					return;
 				}
 							
@@ -647,8 +667,11 @@ function getCurrentTime() {
 	return new Date().getTime() / 1000;
 }
 
-function displayStatistics(gameState) {
-	document.getElementById("score").innerHTML = gameState.score;
-	document.getElementById("currentStreak").innerHTML = gameState.currentStreak;
-	document.getElementById("longestStreak").innerHTML = gameState.longestStreak;
+function displayStatistics(gameState, skipTypingSpeed) {
+	gameState.dom[0].innerHTML = gameState.score;
+	gameState.dom[1].innerHTML = gameState.currentStreak;
+	gameState.dom[2].innerHTML = gameState.longestStreak;
+	if ( !skipTypingSpeed ) {
+		gameState.dom[3].innerHTML = gameState.typingSpeed;
+	}
 }
