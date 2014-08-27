@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Airline Geek Game</title>
+<style type="text/css">
+	
+	body {
+		font-family: Arial, Sans-Serif;
+	}
+	
+	.gamePiece {
+		border: 1px solid green;
+		border-radius: 3px;
+		background-color: white;
+		color: black;
+		padding: 2px;
+		width: 80px;
+		text-align: center;
+	}
+	
+	#pool .gamePiece {
+		margin-top: 10px;
+	}
+	
+	.draggedItem{
+		background-color: green;
+		color: white;
+	}
+	
+	.highlight {
+		background-color: #F4F8BB;
+	}
+	
+	[draggable] {
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: move;
+	}
+	
+	.hidden {
+		display: none;
+	}
+
+	.reveal {
+		display: visible;
+	}
+	
+	.correctAnswer {
+		background-color: green;
+		color: white;
+		transition: background-color 4s;
+	}
+	
+	.incorrectAnswer {
+		background-color: black;
+		color: white;
+		transition: background-color 4s;
+	}
+	
+	#pool {
+		vertical-align: middle;
+	}
+	
+	table#board, #board th, #board td {
+		border-collapse: collapse;
+		border: 1px solid gray;
+		border-spacing: 0px;
+		padding: 5px 2px 2px 5px;
+		text-align: center;
+	}
+	
+	#board td {
+		height: 2em;
+	}
+		
+</style>
+</head>
+<body>
+<table id="board"></table>
+<div id="message"></div>
+<script src="js/corelogic.js"></script>
+</body>
+</html>
