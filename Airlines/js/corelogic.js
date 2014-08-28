@@ -51,10 +51,10 @@ function initialize() {
 		cell.id = "code" + count;
 		cell.addEventListener("dragover", handleDragOver, false);
 		cell.addEventListener("dragend", handleDragEnd, false);
-		cell.addEventListener("drop", handleDrop, false);
 		cell.addEventListener("dragleave", handleDragLeave, false);
+		cell.addEventListener("drop", handleDrop, false);
+
 		row.appendChild(cell);
-		
 		board.appendChild(row);
 	}
 	
@@ -69,11 +69,11 @@ function initialize() {
 	for ( count = 0; count < NUMBER_OF_ROWS; count++ ) {
 		div = document.createElement("div");
 		div.classList.add("gamePiece");
-		div.id = "piece" + count;
+		div.id = "piec" + count;
 		div.setAttribute("draggable","true");
 		div.textContent = codeList[count];
 		div.addEventListener("dragstart", handleDragStart, false);
-		div.addEventListener("dragend", handleDragEnd, false);		
+		div.addEventListener("dragend", handleDragEnd, false);
 		cell.appendChild(div);
 	}	
 	
@@ -108,11 +108,23 @@ function handleDragOver(e) {
 			elementBeingMoved.origin = 1;
 		}
 		else {
-			elementBeingMoved.origin = 2;
+			if ( this.id.indexOf("code") !== -1 ) {
+				elementBeingMoved.origin = 2;
+			}
 		}
 	}
 		
-	elemId = e.target.id.substr(4);  //from the fourth character onwards
+	elemId = "";
+	
+	if ( e.target.id.indexOf("code") !== -1 ) {
+		elemId = e.target.id.substr(4);  //from the fourth character onwards
+	}
+	else {
+		if ( e.target.id.indexOf("piec") !== -1 ) {
+			elemId = e.target.parentNode.id.substr(4);   
+			// if we get something, it will from the code node, which is what we want
+		}
+	}
 	
 	if ( elemId !== "" ) {
 		// no need to do the following for pool
@@ -203,7 +215,7 @@ function checkAnswers() {
 	var correct = 0;
 	
 	for ( count = 0; count < NUMBER_OF_ROWS; count++ ) {
-		elem = document.getElementById("piece" + count);
+		elem = document.getElementById("piec" + count);
 		elem.setAttribute("draggable","false");
 	}
 	
