@@ -25,7 +25,7 @@ function initialize() {
 
 	board = board.firstElementChild;
 	
-	dataList = ["CX Cathay Pacific", "JL Japan Airlines", "AA American Airlines", "CA Air China", "SK SAS-Scandinavian", "EK Emirates", "KL KLM-Royal Dutch", "UA United Airlines", "LH Lufthansa", "SQ Singapore Airlines", "BA British Airways", "AF Air France", "TP TAP Portugal", "TK Turkish Airlines", "MH Malaysia Airlines", "NH ANA-All Nippon Air", "AC Air Canada", "WN Southwest", "MU China Eastern", "CI China Airlines", "BR Eva Air", "KE Korean Air", "OZ Asiana", "PR Philippine Airlines", "SU Aeroflot", "LX SWISS", "DL Delta Airlines", "SA SAA-South Africa Airways"];
+	dataList = ["CX Cathay Pacific", "JL Japan Airlines", "AA American Airlines", "CA Air China", "SK SAS-Scandinavian", "EK Emirates", "KL KLM-Royal Dutch", "UA United Airlines", "LH Lufthansa", "SQ Singapore Airlines", "BA British Airways", "AF Air France", "TP TAP Portugal", "TK Turkish Airlines", "MH Malaysia Airlines", "NH All Nippon Airways", "AC Air Canada", "WN Southwest", "CZ China Eastern Airlines", "CI China Airlines", "BR EVA Air", "KE Korean Air", "OZ Asiana", "PR Philippine Airlines", "SU Aeroflot", "LX SWISS International", "DL Delta Airlines", "SA South Africa Airways", "TG Thai Aiways", "AY Finnair", "AZ Alitalia", "B6 JetBlue Airways", "FI Icelandair", "LY El Al Israel Airlines", "MU China Eastern Airlines", "VS Virgin Atlantic Airways"];
 	
 	for ( count = 0; count < NUMBER_OF_ROWS; count++ ) {
 		seq = Math.floor(Math.random() * dataList.length)
@@ -86,7 +86,7 @@ function initialize() {
 function handleDragStart(e) {
 	e.target.classList.add("draggedItem");
 	e.dataTransfer.effectAllowed = "move";
-	e.dataTransfer.setData("text/plain", "airlineGame");
+	e.dataTransfer.setData("text", "airlineGame");
 	elementBeingMoved.reference = this;
 	elementBeingMoved.origin = 0;
 }
@@ -151,7 +151,8 @@ function handleDragLeave(e) {
 function handleDrop(e) {
 	var child;
 	
-	if ( e.dataTransfer.getData("text/plain") !== "airlineGame" ) {
+	
+	if ( e.dataTransfer.getData("text") !== "airlineGame" ) {
 		// only allow dropping if the object comes from the game
 		return;
 	}
