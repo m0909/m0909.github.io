@@ -27,6 +27,7 @@
                 margin-left: 20px;
                 /*border-top: solid 1px gray; */
                 margin-top: 6px;
+                border-left: solid 1px gray;
             }
         </style>
 
@@ -58,7 +59,10 @@
                     console.log("Video ID = " + videoId)
                     loadPage(videoId);
                     },
-                    function(err) { console.error("Error loading GAPI client for API", err); });
+                    function(err) { 
+                        console.error("Error loading GAPI client for API", err);
+                        updateStatus("Error loading YouTube API client: " + err.error.message, true);
+                    });
         }
 
         function printSnippet(snippet, topLevelDiv = null) {
@@ -154,6 +158,7 @@
                     },
                     function(err) { 
                         console.error("Execute error", err); 
+                        updateStatus("Error encountered: " + err.error.message, true);
                     });
         }
         
