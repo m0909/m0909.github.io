@@ -159,7 +159,7 @@
                     },
                     function(err) { 
                         console.error("Execute error", err); 
-                        updateStatus("Error encountered: " + err.error.message, true);
+                        updateStatus("Error encountered: " + err.result.error.message, true);
                     });
         }
         
