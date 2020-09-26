@@ -81,22 +81,22 @@
             }
             
             node = document.createElement("span");
-            node.setAttribute("class", "comment-author")
+            node.setAttribute("class", "comment-author");
             content = document.createTextNode(snippet.authorDisplayName);
             node.appendChild(content);
-            div.appendChild(node)
+            div.appendChild(node);
 
             node = document.createElement("span");
-            node.setAttribute("class", "comment-time")
+            node.setAttribute("class", "comment-time");
             content = document.createTextNode(snippet.publishedAt);
             node.appendChild(content);
-            div.appendChild(node)
+            div.appendChild(node);
             
             node = document.createElement("span");
-            node.setAttribute("class", "comment-core")
-            content = document.createTextNode(snippet.textDisplay);
-            node.appendChild(content);
-            div.appendChild(node)
+            node.setAttribute("class", "comment-core");
+            // set innerHTML directly because comments are HTML encoded
+            node.innerHTML = snippet.textDisplay;
+            div.appendChild(node);
             
             
             if ( topLevelDiv == null ) {
@@ -161,6 +161,8 @@
                         console.error("Execute error", err); 
                         updateStatus("Error encountered: " + err.result.error.message, true);
                     });
+                    
+
         }
         
         function execute() {
