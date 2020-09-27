@@ -150,7 +150,7 @@
                         updateStatus("Processing detailed comments");
                         // show comments from the current response
                         var result = response.result;
-                        console.log("Response", result);
+                        //console.log("Response", result);
                         result.items.forEach(element => {
                             printSnippet(element.snippet, topLevelDiv);
                         });
@@ -182,7 +182,7 @@
         */
 
         function extractInfo(result, isLastPage) {
-            console.log(result);
+            //console.log(result);
             result.items.forEach(element => {
                 var topLevelComment = element.snippet.topLevelComment;
                 var topLevelDiv = printSnippet(topLevelComment.snippet);
@@ -228,7 +228,7 @@
                         
                         var result = response.result;
                         var hasNextPage = result["nextPageToken"];
-                        console.log("Response", result);
+                        //console.log("Response", result);
                         
                         if ( result.pageInfo.totalResults == 0 ) {
                             updateStatus("No comments found", true);
