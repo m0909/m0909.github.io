@@ -40,30 +40,56 @@
          * https://developers.google.com/explorer-help/guides/code_samples#javascript
          */
 
-        function updateStatus(text, isDone=false) {
-            var node = document.getElementById('statusBar');
-            var html = "<p>Status: " + text + "</p>";
-            if ( isDone ) {
-                html = html + "<button onclick=\"document.location.reload(true)\">Select another video</button>";
+        m_GAPI_loaded = false;
+
+        function enableVideoIDInput(enable) {
+            var node = document.getElementById('videoId');
+            if ( enable ) {
+                node.removeAttribute("disabled");
             }
-            node.innerHTML = html;
+            else {
+                node.setAttribute("disabled", "true");
+            }
+        }
+
+        function hideElement(elementId, hide) {
+            var node = document.getElementById(elementId);
+            if ( hide ) {
+                node.setAttribute("hidden", "true");
+            }
+            else {
+                node.removeAttribute("hidden");
+            }
+        }
+
+        function updateStatus(text, isDone=false) {
+            var node = document.getElementById('statusBar2');
+            node.innerHTML = "<p>Status: " + text + "</p>";
+
+            if ( isDone ) {
+                hideElement("statusBar3", false);
+            }
         }
 
         function loadClient() {
-            gapi.client.setApiKey("AIzaSyCLt8kDGTOUvYaWuaT61gQCtFxuFO4h3_8");
-            updateStatus("Loading YouTube client API");
-            return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
-                .then(function() { 
-                    console.log("GAPI client loaded for API"); 
-                    updateStatus("Loaded YouTube client API");
-                    var videoId = document.getElementById("videoId").value;
-                    console.log("Video ID = " + videoId)
-                    loadPage(videoId);
-                    },
-                    function(err) { 
-                        console.error("Error loading GAPI client for API", err);
-                        updateStatus("Error loading YouTube API client: " + err.error.message, true);
-                    });
+            if ( m_GAPI_loaded ) {
+                loadPage();
+            }
+            else {
+                gapi.client.setApiKey("AIzaSyCLt8kDGTOUvYaWuaT61gQCtFxuFO4h3_8");
+                updateStatus("Loading YouTube client API");
+                return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+                    .then(function() { 
+                        console.log("GAPI client loaded for API"); 
+                        updateStatus("Loaded YouTube client API");
+                        m_GAPI_loaded = true;
+                        loadPage();
+                        },
+                        function(err) { 
+                            console.error("Error loading GAPI client for API", err);
+                            updateStatus("Error loading YouTube API client: " + err.error.message, true);
+                        });
+            }
         }
 
         function printSnippet(snippet, topLevelDiv = null) {
@@ -110,7 +136,8 @@
         }
 
         /* 2020-09-27 added comment handler */
-        function loadComments(topLevelDiv, parentId, pageToken="") {
+        function loadComments(topLevelDiv, parentId, parentIsLast, pageToken="") {
+
             return gapi.client.youtube.comments.list({
                 "part": ["snippet"],
                 "parentId": parentId,
@@ -130,10 +157,15 @@
 
                         // iterative call to get subsequent comments
                         if ( result["nextPageToken"] ) {
-                            loadComments(topLevelDiv, parentId, result.nextPageToken);
+                            loadComments(topLevelDiv, parentId, parentIsLast, result.nextPageToken);
                         }
                         else {
-                            updateStatus("Processed all detailed comments", true);
+                            if ( parentIsLast ) {
+                                updateStatus("Processed all comments", true);
+                            }
+                            else {
+                                updateStatus("Processed all detailed comments");
+                            }
                         }
                     },
                     function(err) { 
@@ -143,7 +175,13 @@
                 
         }
 
-        function extractInfo(result) {
+        /*
+            isLastPage (boolean) 
+            Since extractInfo may involve an asynchronous call in loadComments(), we have to pass isLastPage so that the 
+            target can update the status to completed when we are on the last page of thread of comments
+        */
+
+        function extractInfo(result, isLastPage) {
             console.log(result);
             result.items.forEach(element => {
                 var topLevelComment = element.snippet.topLevelComment;
@@ -152,8 +190,9 @@
                 // show replies if present
                 var numReplies = element.snippet.totalReplyCount;
                 if ( numReplies > 5 ) {
-                    // need to use comments.list 202-09-27
-                    loadComments(topLevelDiv, topLevelComment.id);
+                    // need to use comments.list 2020-09-27
+                    // this is an async call
+                    loadComments(topLevelDiv, topLevelComment.id, isLastPage);
                 }
                 else {
                     if ( numReplies > 0 ) {
@@ -165,8 +204,10 @@
             });
         }
 
-        function loadPage(videoId, pageToken="") {
+        function loadPage(videoId="", pageToken="") {
             if ( pageToken == "" ) {
+                videoId = document.getElementById("videoId").value;
+                console.log("Video ID = " + videoId)
                 updateStatus("Loading comments");
             }
             else {
@@ -184,18 +225,27 @@
                 .then(
                     function(response) {
                         // Handle the results here (response.result has the parsed body).
-                        updateStatus("Processing comments");
+                        
                         var result = response.result;
+                        var hasNextPage = result["nextPageToken"];
                         console.log("Response", result);
-                        extractInfo(result);
-
-                        // iterative call to get subsequent comments
-                        if ( result["nextPageToken"] ) {
-                            loadPage(videoId, result.nextPageToken);
+                        
+                        if ( result.pageInfo.totalResults == 0 ) {
+                            updateStatus("No comments found", true);
                         }
                         else {
-                            updateStatus("Processed all comments", true);
+                            updateStatus("Processing comments");
+                            extractInfo(result, !hasNextPage);
+
+                            // iterative call to get subsequent comments
+                            if ( hasNextPage ) {
+                                loadPage(videoId, result.nextPageToken);
+                            }
+                            else {
+                                updateStatus("Processed all comments", true);
+                            }
                         }
+
                     },
                     function(err) { 
                         console.error("Execute error", err); 
@@ -206,8 +256,23 @@
         }
         
         function execute() {
+            hideElement("statusBar1", true);
+            enableVideoIDInput(false);
             // when loadClient is done, it calls loadPage    
             loadClient();
+        }
+
+        function reset() {
+            var node;
+            node = document.getElementById("videoId");
+            node.value = "";
+            node.removeAttribute("disabled");
+            node = document.getElementById("statusBar2");
+            node.innerHTML = "&nbsp;"    
+
+            hideElement("statusBar1", false);
+            hideElement("statusBar3", true);
+            
         }
 
         gapi.load("client");
@@ -216,14 +281,16 @@
 
     <body>
         <h1>YouTube Video Comment Extractor</h1>
-        <table>
-            <tbody>
-                <tr><td>YouTube video ID:</td><td><input type="text" id="videoId" value="" autofocus /></td></tr>
-            </tbody>
-        </table>
-        <div id="statusBar">
-            <button id="execute" onclick="execute()">Start</button>
+        <span>YouTube video ID:&nbsp;</span><input type="text" id="videoId" value="" autofocus />
+        <div id="statusBar1">
+            <button onclick="execute()">Start</button>
         </div>        
+        <div id="statusBar2">
+            &nbsp;
+        </div>
+        <div id="statusBar3" hidden>
+            <button onclick="reset()">Process another video</button>
+        </div>
         <div id="outputSection">
         </div>
     </body>
