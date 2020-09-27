@@ -109,18 +109,58 @@
             return div;
         }
 
+        /* 2020-09-27 added comment handler */
+        function loadComments(topLevelDiv, parentId, pageToken="") {
+            return gapi.client.youtube.comments.list({
+                "part": ["snippet"],
+                "parentId": parentId,
+                "maxResults": 100,
+                "pageToken": pageToken
+            })
+                .then(
+                    function(response) {
+                        
+                        updateStatus("Processing detailed comments");
+                        // show comments from the current response
+                        var result = response.result;
+                        console.log("Response", result);
+                        result.items.forEach(element => {
+                            printSnippet(element.snippet, topLevelDiv);
+                        });
+
+                        // iterative call to get subsequent comments
+                        if ( result["nextPageToken"] ) {
+                            loadComments(topLevelDiv, parentId, result.nextPageToken);
+                        }
+                        else {
+                            updateStatus("Processed all detailed comments", true);
+                        }
+                    },
+                    function(err) { 
+                        console.error("Execute error", err); 
+                        updateStatus("Error encountered: " + err.result.error.message, true);
+                    });
+                
+        }
+
         function extractInfo(result) {
             console.log(result);
             result.items.forEach(element => {
-                var topLevel = element.snippet.topLevelComment;
-                var topLevelDiv = printSnippet(topLevel.snippet);
+                var topLevelComment = element.snippet.topLevelComment;
+                var topLevelDiv = printSnippet(topLevelComment.snippet);
                 
                 // show replies if present
-                if ( element["replies"] ) {
-                    element.replies.comments.forEach(response => {
-                        printSnippet(response.snippet, topLevelDiv);
-                    });
-             
+                var numReplies = element.snippet.totalReplyCount;
+                if ( numReplies > 5 ) {
+                    // need to use comments.list 202-09-27
+                    loadComments(topLevelDiv, topLevelComment.id);
+                }
+                else {
+                    if ( numReplies > 0 ) {
+                        element.replies.comments.forEach(response => {
+                            printSnippet(response.snippet, topLevelDiv);
+                        });
+                    }
                 }
             });
         }
